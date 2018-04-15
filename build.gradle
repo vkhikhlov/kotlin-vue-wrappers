@@ -1,0 +1,37 @@
+allprojects {
+    group = 'com.github.vkhikhlov'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+
+subprojects {
+    apply plugin: 'kotlin2js'
+
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+    }
+
+    compileKotlin2Js {
+        kotlinOptions {
+            moduleKind = 'commonjs'
+            metaInfo = true
+            sourceMap = true
+            sourceMapEmbedSources = "always"
+            suppressWarnings = true
+            outputFile = "$project.buildDir.path/classes/main/${project.name}.js"
+        }
+    }
+}
