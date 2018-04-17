@@ -1,4 +1,4 @@
 dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlinxHtmlVersion"
-    compile project(':extensions')
+    compile project(':kotlin-vue-extensions')
 }

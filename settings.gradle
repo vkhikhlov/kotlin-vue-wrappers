@@ -1,4 +1,4 @@
-rootProject.name = 'kotlin-vue'
+rootProject.name = 'kotlin-vue-wrappers'
 
-include 'vue'
-include 'extensions'
+include 'kotlin-vue'
+include 'kotlin-vue-extensions'

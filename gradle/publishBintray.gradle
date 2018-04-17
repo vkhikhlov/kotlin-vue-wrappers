@@ -22,7 +22,7 @@ def pomConfig = {
     }
 
     scm {
-        url "https://github.com/vkhikhlov/kotlin-vue"
+        url "https://github.com/vkhikhlov/kotlin-vue-wrappers"
     }
 }
 
@@ -42,7 +42,7 @@ publishing {
                 def root = asNode()
                 root.appendNode('name', project.name)
                 root.appendNode('description', 'Kotlin javascript wrappers for Vue.')
-                root.appendNode('url', "https://github.com/vkhikhlov/kotlin-vue")
+                root.appendNode('url', "https://github.com/vkhikhlov/kotlin-vue-wrappers")
                 root.children().last() + pomConfig
             }
         }
