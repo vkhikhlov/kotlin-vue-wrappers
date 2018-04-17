@@ -1,0 +1,62 @@
+apply plugin: 'kotlin2js'
+apply plugin: 'org.jetbrains.kotlin.frontend'
+
+buildscript {
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:$kotlinFrontendPluginVersion"
+    }
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+}
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
+    kotlinOptions.suppressWarnings = true
+    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
+    kotlinOptions.main = "call"
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+    maven {
+        url "https://dl.bintray.com/kotlin/kotlin-eap"
+    }
+    maven {
+        url "https://dl.bintray.com/vkhikhlov/kotlin-vue-wrappers"
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+    compile "com.github.vkhikhlov:kotlin-vue:0.0.2"
+}
+
+kotlinFrontend {
+    downloadNodeJsVersion = "latest"
+    sourceMaps = true
+    npm {
+        dependency("vue", "latest")
+        devDependency("html-webpack-plugin", "latest")
+    }
+
+    webpackBundle {
+        bundleName = "main"
+        contentPath = file('src/main/web')
+        port = 8088
+    }
+}
