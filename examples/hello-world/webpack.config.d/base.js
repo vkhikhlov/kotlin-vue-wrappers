@@ -5,6 +5,8 @@ function resolve(dir) {
     return path.join(__dirname, dir);
 }
 
+config.mode = 'development';
+
 Object.assign(config.resolve, {
     alias: {
         'vue$': 'vue/dist/vue.common.js'

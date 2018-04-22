@@ -41,9 +41,9 @@ open class VBuilder(val createElement: CreateElement) {
 
     fun child(type: Any, opts: VNodeDataOptions<VProps> = VNodeDataOptions(), children: List<Any>? = null) = create(type, opts, children)
 
-    fun <P : VProps> child(type: VueOptions<*, P, *, *, *, *, *>, props: P.() -> Unit = { }): Any {
+    fun <P : VProps> child(type: VueOptions<*, P, *, *, *>, props: P.() -> Unit = { }): Any {
         val opts = VNodeDataOptions<P>()
-        opts.props = jsObject<P> { }.apply(props)
+        opts.props = jsObject(props)
         return create(type, opts, null)
     }
 

@@ -9,26 +9,22 @@ interface VData
 interface VWatch
 interface VComputed
 interface VProps
-interface VOptions
 interface VRefs
 
 typealias CreateElement = (renderElement: Any, definition: dynamic, children: Array<Any>?) -> VNode
 
-external interface VueComponent<out D : VData, out P : VProps, out O : VOptions, out R : VRefs> {
+external interface VueComponent<out D : VData, out P : VProps, out R : VRefs> {
     @JsName("\$el")
     val el: HTMLElement
 
     @JsName("\$parent")
-    val parent: Vue<*, *, *, *, *, *, *>
+    val parent: VueComponent<*, *, *>
 
     @JsName("\$data")
     val data: D
 
     @JsName("\$props")
     val props: P
-
-    @JsName("\$options")
-    val options: O
 
     @JsName("\$refs")
     val refs: R
@@ -37,13 +33,13 @@ external interface VueComponent<out D : VData, out P : VProps, out O : VOptions,
     val isMounted: Boolean
 
     @JsName("\$children")
-    val children: Array<Vue<*, *, *, *, *, *, *>>
+    val children: Array<VueComponent<*, *, *>>
 
     @JsName("\$nextTick")
     fun nextTick(callback: () -> Unit, context: Array<Any>?)
 
     @JsName("\$mount")
-    fun mount(elementOrSelector: Any?, hydrating: Boolean? = definedExternally): Vue<*, *, *, *, *, *, *>
+    fun mount(elementOrSelector: Any?, hydrating: Boolean? = definedExternally): VueComponent<*, *, *>
 
     @JsName("\$emit")
     fun emit(event: String, value: Any?)
@@ -62,33 +58,36 @@ external interface VueComponent<out D : VData, out P : VProps, out O : VOptions,
 abstract class VueOptions<
         out D : VData,
         out P : VProps,
-        out C : VComputed,
-        out W : VWatch,
-        out O : VOptions,
         out R : VRefs,
-        out VC : VueComponent<D, P, O, R>>(kClass: KClass<out VC>) {
+        out C : VComputed,
+        out VC : VueComponent<D, P, R>>(kClass: KClass<out VC>) {
     @JsName("_extends")
-    open fun extends(): VueOptions<*, *, *, *, *, *, *>? = null
+    open fun extends(): VueOptions<*, *, *, *, *>? = null
 
+    open fun onCreated() = Unit
     open fun onMounted() = Unit
     open fun onBeforeCreate() = Unit
+    open fun onBeforeMount() = Unit
+    open fun onBeforeDestroy() = Unit
+    open fun onDestroyed() = Unit
+    open fun onBeforeUpdate() = Unit
+    open fun onUpdated() = Unit
+
     open fun getComponentNamePrefix() = ""
 
     @JsName("__data")
     val data
-        get() = that.data
-
+        get() = requireIsCreated(that.data)
     @JsName("__props")
     val props
-        get() = that.props
+        get() = requireIsCreated(that.props)
 
-    // :todo: Make needed requires
-    val options get() = that.options
-    val refs get() = that.refs
-    val el get() = that.el
-    val parent get() = that.parent
-    val children get() = that.children
+    val refs get() = requireIsMounted(that.refs)
+    val el get() = requireIsMounted(that.el)
+    val parent get() = requireIsCreated(that.parent)
+    val children get() = requireIsCreated(that.children)
     val isMounted get() = that.isMounted
+    var isCreated = false
     @Suppress("MemberVisibilityCanBePrivate")
     val that
         get() = _that
@@ -106,8 +105,26 @@ abstract class VueOptions<
     @JsName("mounted")
     private val mounted = { onMounted() }
 
+    @JsName("created")
+    private val created = { isCreated = true; onCreated() }
+
+    @JsName("updated")
+    private val updated = { onUpdated() }
+
+    @JsName("destroyed")
+    private val destroyed = { onDestroyed() }
+
+    @JsName("beforeMount")
+    private val beforeMount = { onBeforeMount() }
+
     @JsName("beforeCreate")
     private val beforeCreate = { _that = js("this").unsafeCast<VC>(); onBeforeCreate() }
+
+    @JsName("beforeUpdate")
+    private val beforeUpdate = { onBeforeUpdate() }
+
+    @JsName("beforeDestroy")
+    private val beforeDestroy = { onBeforeDestroy() }
 
     @Suppress("PrivatePropertyName")
     @JsName("data")
@@ -117,7 +134,7 @@ abstract class VueOptions<
     private val computed = jsObject<C> { }
 
     @JsName("watch")
-    private val watch = jsObject<W> { }
+    private var watch: dynamic = undefined
 
     @Suppress("PrivatePropertyName")
     @JsName("props")
@@ -136,8 +153,8 @@ abstract class VueOptions<
         computed.apply(block)
     }
 
-    fun watch(block: W.() -> Unit = { }) {
-        watch.apply(block)
+    fun <W : VWatch> watch(block: W.() -> Unit = { }) {
+        watch = jsObject(block)
     }
 
     fun props(block: P.() -> Unit = { }) {
@@ -146,8 +163,13 @@ abstract class VueOptions<
 
     abstract fun Template.render()
     inline operator fun <reified T> (() -> T).unaryPlus() = unsafeCast<T>()
-    fun <T> requireIsMounted(f: T): T {
+    private fun <T> requireIsMounted(value: T): T {
         require(that.isMounted)
-        return f
+        return value
+    }
+
+    private fun <T> requireIsCreated(value: T): T {
+        require(isCreated)
+        return value
     }
 }

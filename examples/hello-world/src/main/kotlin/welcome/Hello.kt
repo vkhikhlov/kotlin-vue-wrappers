@@ -8,21 +8,15 @@ interface WelcomeProps : VProps {
     var name: String
 }
 
-interface WelcomeComponent : VueComponent<VData, WelcomeProps, VOptions, VRefs>
+interface WelcomeComponent : VueComponent<VData, WelcomeProps, VRefs>
 
-object WelcomeOptions : VueOptions<
-        VData,
-        WelcomeProps,
-        VComputed,
-        VWatch,
-        VOptions,
-        VRefs,
-        WelcomeComponent>(WelcomeComponent::class) {
+object WelcomeOptions : VueOptions<VData, WelcomeProps, VRefs, VComputed, WelcomeComponent>(WelcomeComponent::class) {
     init {
         props {
             name = jsObject { }
         }
     }
+
     override fun Template.render() {
         root {
             keep = false
@@ -30,6 +24,5 @@ object WelcomeOptions : VueOptions<
         }
     }
 }
-
 
 fun VBuilder.welcome(props: WelcomeProps.() -> Unit = { name = "kotlin-vue" }) = child(WelcomeOptions, props)

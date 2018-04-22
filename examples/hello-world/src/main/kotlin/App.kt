@@ -2,16 +2,9 @@ import vue.*
 import vue.vdom.*
 import welcome.*
 
-interface AppComponent : VueComponent<VData, VProps, VOptions, VRefs>
+interface AppComponent : VueComponent<VData, VProps, VRefs>
 
-object AppOptions : VueOptions<
-        VData,
-        VProps,
-        VComputed,
-        VWatch,
-        VOptions,
-        VRefs,
-        AppComponent>(AppComponent::class) {
+object AppOptions : VueOptions<VData, VProps, VRefs, VComputed, AppComponent>(AppComponent::class) {
     override fun Template.render() {
         root {
             welcome()

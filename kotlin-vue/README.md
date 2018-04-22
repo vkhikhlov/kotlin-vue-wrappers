@@ -18,7 +18,7 @@ maven {
 Add dependency:
 
 ```groovy
-compile "com.github.vkhikhlov:kotlin-vue:0.0.2"
+compile "com.github.vkhikhlov:kotlin-vue:0.0.3"
 ```
 
 ### Create Vue component
@@ -98,8 +98,8 @@ and then:
 ```
 
 But refer to official Vue documentation, if you’re writing a lot of render functions, it might feel painful to use them.
-That’s why there’s a Babel plugin to use JSX with Vue, getting us back to a syntax that’s closer to 
-templates. So, using JSX we can rewrite it like that:
+That’s why there’s a Babel plugin to use JSX with Vue, getting us back to a syntax that’s closer to templates. 
+So, using JSX we can rewrite it like that:
 
 ```vue
 <script>
@@ -115,7 +115,7 @@ templates. So, using JSX we can rewrite it like that:
                 <h1>
                     { this.name }
                 </h1>
-            )
+            );
         }
     };
 </script>
@@ -132,7 +132,7 @@ and then:
                 <div>
                     <Hello/>
                 </div>
-            )
+            );
         }
     };
 </script>
@@ -151,16 +151,9 @@ interface WelcomeProps : VProps {
     var name: String
 }
 
-interface WelcomeComponent : VueComponent<VData, WelcomeProps, VOptions, VRefs>
+interface WelcomeComponent : VueComponent<VData, WelcomeProps, VRefs>
 
-object WelcomeOptions : VueOptions<
-        VData, 
-        WelcomeProps, 
-        VComputed, 
-        VWatch, 
-        VOptions, 
-        VRefs, 
-        WelcomeComponent>(WelcomeComponent::class) {
+object WelcomeOptions : VueOptions<VData, WelcomeProps, VRefs, VComputed, WelcomeComponent>(WelcomeComponent::class) {
     init {
         props {
             name = jsObject { }
@@ -187,16 +180,9 @@ import vue.*
 import vue.vdom.*
 import welcome.*
 
-interface AppComponent : VueComponent<VData, VProps, VOptions, VRefs>
+interface AppComponent : VueComponent<VData, VProps, VRefs>
 
-object AppOptions : VueOptions<
-        VData, 
-        VProps, 
-        VComputed, 
-        VWatch, 
-        VOptions, 
-        VRefs, 
-        AppComponent>(AppComponent::class) {
+object AppOptions : VueOptions<VData, VProps, VRefs, VComputed, AppComponent>(AppComponent::class) {
     override fun Template.render() {
         root {
             welcome()
