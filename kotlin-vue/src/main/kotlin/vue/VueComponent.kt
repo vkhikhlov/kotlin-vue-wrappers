@@ -1,8 +1,10 @@
 package vue
 
+import kotlinx.html.Tag
 import org.w3c.dom.HTMLElement
 import vue.vdom.Template
 import vue.ext.jsObject
+import vue.vdom.RootNode
 import kotlin.reflect.KClass
 
 interface VData
@@ -161,7 +163,7 @@ abstract class VueOptions<
         __props.apply(block)
     }
 
-    abstract fun Template.render()
+    abstract fun Template.render(): RootNode<Tag>
     inline operator fun <reified T> (() -> T).unaryPlus() = unsafeCast<T>()
     private fun <T> requireIsMounted(value: T): T {
         require(that.isMounted)

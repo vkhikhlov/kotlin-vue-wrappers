@@ -2,6 +2,7 @@ package vue
 
 import org.w3c.dom.HTMLElement
 
+@Suppress("Unused")
 @JsModule("vue")
 open external class Vue<
         D : VData,

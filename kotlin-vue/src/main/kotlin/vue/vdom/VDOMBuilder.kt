@@ -6,6 +6,7 @@ import vue.CreateElement
 import vue.VBuilder
 
 open class RootNode<out T : Tag>(createElement: CreateElement, factory: (TagConsumer<Unit>) -> T) : VDOMBuilder<T>(createElement, factory) {
+    @Suppress("MemberVisibilityCanBePrivate")
     var keep = true
     override fun build(): Any {
         return if (keep) {
@@ -28,6 +29,7 @@ open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagC
             opts.attrs[attribute] = value
         }
 
+        override fun onTagComment(content: CharSequence) {}
         override fun onTagContent(content: CharSequence) {}
         override fun onTagContentEntity(entity: Entities) {}
         override fun onTagContentUnsafe(block: Unsafe.() -> Unit) {}

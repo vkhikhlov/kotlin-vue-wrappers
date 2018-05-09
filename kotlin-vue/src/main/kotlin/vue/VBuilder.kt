@@ -28,7 +28,7 @@ open class VBuilder(val createElement: CreateElement) {
             ref = opts.ref
             key = opts.key
         }
-        return child(createElement(type, data, children?.toTypedArray()))
+        return createElement(type, data, children?.toTypedArray())
     }
 
     protected val opts = VNodeDataOptions<VProps>()
@@ -39,19 +39,20 @@ open class VBuilder(val createElement: CreateElement) {
         return node
     }
 
-    fun child(type: Any, opts: VNodeDataOptions<VProps> = VNodeDataOptions(), children: List<Any>? = null) = create(type, opts, children)
+    fun child(type: Any, opts: VNodeDataOptions<VProps> = VNodeDataOptions(), children: List<Any>? = null) =
+            child(create(type, opts, children))
 
     fun <P : VProps> child(type: VueOptions<*, P, *, *, *>, props: P.() -> Unit = { }): Any {
         val opts = VNodeDataOptions<P>()
         opts.props = jsObject(props)
-        return create(type, opts, null)
+        return child(create(type, opts, null))
     }
 
     fun <T : VProps> child(type: Any, v: V<T>.() -> Unit = { }): Any {
         val opts = VNodeDataOptions<T>()
         val vOpts = V(opts)
         vOpts.apply(v)
-        return create(type, opts, null)
+        return child(create(type, opts, null))
     }
 
     operator fun String.unaryPlus() {
