@@ -2,3 +2,4 @@ rootProject.name = 'kotlin-vue-wrappers'
 
 include 'kotlin-vue'
 include 'kotlin-vue-extensions'
+include 'kotlin-vue-router'

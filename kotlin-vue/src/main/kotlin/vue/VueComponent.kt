@@ -2,6 +2,7 @@ package vue
 
 import org.w3c.dom.HTMLElement
 import vue.ext.jsObject
+import vue.router.Router
 import kotlin.reflect.KClass
 
 external interface VData
@@ -27,6 +28,9 @@ external interface VueComponent<out D : VData, out P : VProps, out R : VRefs> {
 
     @JsName("\$refs")
     val refs: R
+
+    @JsName("\$router")
+    val router: Router
 
     @JsName("_isMounted")
     val isMounted: Boolean
@@ -141,6 +145,9 @@ abstract class VueOptions<
 
     @JsName("render")
     val render = { h: CreateElement -> VBuilder(h).apply { render() }.children.firstOrNull() }
+
+    @JsName("router")
+    var router: Router? = undefined
 
     fun data(block: D.() -> Unit = { }) {
         _data.apply(block)

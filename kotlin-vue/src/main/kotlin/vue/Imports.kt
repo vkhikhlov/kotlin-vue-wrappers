@@ -1,6 +1,7 @@
 package vue
 
 import org.w3c.dom.HTMLElement
+import vue.router.Router
 
 @Suppress("Unused")
 @JsModule("vue")
@@ -14,6 +15,7 @@ open external class Vue<
     override val props: P
     override val data: D
     override val refs: R
+    override val router: Router
     override val isMounted: Boolean
     override val parent: VueComponent<*, *, *>
     override val children: Array<VueComponent<*, *, *>>
