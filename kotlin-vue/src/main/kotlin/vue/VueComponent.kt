@@ -1,17 +1,14 @@
 package vue
 
-import kotlinx.html.Tag
 import org.w3c.dom.HTMLElement
-import vue.vdom.Template
 import vue.ext.jsObject
-import vue.vdom.RootNode
 import kotlin.reflect.KClass
 
-interface VData
-interface VWatch
-interface VComputed
-interface VProps
-interface VRefs
+external interface VData
+external interface VWatch
+external interface VComputed
+external interface VProps
+external interface VRefs
 
 typealias CreateElement = (renderElement: Any, definition: dynamic, children: Array<Any>?) -> VNode
 
@@ -143,9 +140,7 @@ abstract class VueOptions<
     private val __props = jsObject<P> { }
 
     @JsName("render")
-    val render = { h: CreateElement ->
-        Template(h).apply { render() }.build()
-    }
+    val render = { h: CreateElement -> VBuilder(h).apply { render() }.children.firstOrNull() }
 
     fun data(block: D.() -> Unit = { }) {
         _data.apply(block)
@@ -163,7 +158,7 @@ abstract class VueOptions<
         __props.apply(block)
     }
 
-    abstract fun Template.render(): RootNode<Tag>
+    abstract fun VBuilder.render()
     inline operator fun <reified T> (() -> T).unaryPlus() = unsafeCast<T>()
     private fun <T> requireIsMounted(value: T): T {
         require(that.isMounted)

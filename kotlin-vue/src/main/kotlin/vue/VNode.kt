@@ -19,18 +19,18 @@ external interface VNodeData {
     var key: String?
 }
 
-data class VNodeDataOptions<T : VProps>(
+data class VNodeOptions<T : VProps>(
         val attrs: MutableMap<String, String?> = mutableMapOf(),
         val clazz: MutableMap<String, Boolean> = mutableMapOf(),
         val on: MutableMap<String, (dynamic) -> Unit> = mutableMapOf(),
         val nativeOn: MutableMap<String, (dynamic) -> Unit> = mutableMapOf(),
-        var props: T? = null,
-        var style: CSSStyleDeclaration? = null,
-        var ref: String? = null,
-        var key: String? = null
+        var props: T? = undefined,
+        var style: CSSStyleDeclaration? = undefined,
+        var ref: String? = undefined,
+        var key: String? = undefined
 )
 
-interface IV<out T : VProps> {
+interface IVElementDataBuilder<out T : VProps> {
     interface IBind {
         interface IClass {
             infix fun String.to(that: Boolean)
@@ -59,16 +59,16 @@ interface IV<out T : VProps> {
     var key: String?
 }
 
-class V<T : VProps>(opts: VNodeDataOptions<T>) : IV<T> {
+class VElementDataBuilder<T : VProps>(opts: VNodeOptions<T>) : IVElementDataBuilder<T> {
     private val options = opts
-    override val bind = object : IV.IBind {
-        private val clazz = object : IV.IBind.IClass {
+    override val bind = object : IVElementDataBuilder.IBind {
+        private val clazz = object : IVElementDataBuilder.IBind.IClass {
             override infix fun String.to(that: Boolean) {
                 options.clazz[this] = that
             }
         }
 
-        override fun clazz(block: IV.IBind.IClass.() -> Unit) {
+        override fun clazz(block: IVElementDataBuilder.IBind.IClass.() -> Unit) {
             clazz.block()
         }
 
@@ -77,12 +77,12 @@ class V<T : VProps>(opts: VNodeDataOptions<T>) : IV<T> {
             options.style?.block()
         }
     }
-    override val on = object : IV.IOn {
+    override val on = object : IVElementDataBuilder.IOn {
         override fun click(fn: (MouseEvent) -> Unit) {
             options.on["click"] = fn
         }
 
-        override val click = object : IV.IOn.IClick {
+        override val click = object : IVElementDataBuilder.IOn.IClick {
             override fun ctrl(fn: (MouseEvent) -> Unit) {
                 options.on["click"] = {
                     if ((it as MouseEvent).ctrlKey) fn(it)
@@ -108,12 +108,14 @@ class V<T : VProps>(opts: VNodeDataOptions<T>) : IV<T> {
             options.attrs.putAll(value)
         }
 
-    override var key: String? = null
+    override var key
+        get() = options.key
         set(value) {
             options.key = value
         }
 
-    override var ref: String? = null
+    override var ref: String?
+        get() = options.ref
         set(value) {
             options.ref = value
         }

@@ -5,22 +5,6 @@ import org.w3c.dom.events.Event
 import vue.CreateElement
 import vue.VBuilder
 
-open class RootNode<out T : Tag>(createElement: CreateElement, factory: (TagConsumer<Unit>) -> T) : VDOMBuilder<T>(createElement, factory) {
-    @Suppress("MemberVisibilityCanBePrivate")
-    var keep = true
-    override fun build(): Any {
-        return if (keep) {
-            create(attrs.tagName, opts, children)
-        } else {
-            if (children.size > 1) {
-                create(attrs.tagName, opts, children)
-            } else {
-                children.first()
-            }
-        }
-    }
-}
-
 open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagConsumer<Unit>) -> T) : VBuilder(createElement) {
     open fun build() = create(attrs.tagName, opts, children)
 
@@ -39,6 +23,7 @@ open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagC
         override fun finalize() {}
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     val attrs: T = factory(consumer)
 
     init {
@@ -49,9 +34,4 @@ open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagC
             }
         }
     }
-}
-
-class Template(createElement: CreateElement) : VBuilder(createElement) {
-    var rootNode = RootNode(createElement, { DIV(attributesMapOf("class", null), it) })
-    fun build() = rootNode.build()
 }

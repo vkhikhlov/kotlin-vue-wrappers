@@ -9,7 +9,7 @@ annotation class VueDsl
 open class VBuilder(val createElement: CreateElement) {
     val children = mutableListOf<Any>()
 
-    fun <T : VProps> create(type: Any, opts: VNodeDataOptions<T>, children: List<Any>?): Any {
+    fun <T : VProps> create(type: Any, opts: VNodeOptions<T>, children: List<Any>?): Any {
         fun <T> initJsonOf(map: Map<String, T?>): JsonOf<T> {
             val result = jsObject<JsonOf<T>> { }
             map.entries.forEach {
@@ -31,28 +31,24 @@ open class VBuilder(val createElement: CreateElement) {
         return createElement(type, data, children?.toTypedArray())
     }
 
-    protected val opts = VNodeDataOptions<VProps>()
-    val v = V(opts)
+    protected val opts = VNodeOptions<VProps>()
+    val v = VElementDataBuilder(opts)
 
     fun child(node: Any): Any {
         children.add(node)
         return node
     }
 
-    fun child(type: Any, opts: VNodeDataOptions<VProps> = VNodeDataOptions(), children: List<Any>? = null) =
-            child(create(type, opts, children))
-
-    fun <P : VProps> child(type: VueOptions<*, P, *, *, *>, props: P.() -> Unit = { }): Any {
-        val opts = VNodeDataOptions<P>()
-        opts.props = jsObject(props)
-        return child(create(type, opts, null))
+    @Suppress("Unused")
+    fun child(options: VueOptions<*, *, *, *, *>, block: VBuilder.() -> Unit = { }): Any {
+        val builder = VBuilder(createElement).apply(block)
+        return child(create(options, builder.opts, builder.children))
     }
 
-    fun <T : VProps> child(type: Any, v: V<T>.() -> Unit = { }): Any {
-        val opts = VNodeDataOptions<T>()
-        val vOpts = V(opts)
-        vOpts.apply(v)
-        return child(create(type, opts, null))
+    @Suppress("Unused")
+    fun child(tagName: String, block: VBuilder.() -> Unit = { }): Any {
+        val builder = VBuilder(createElement).apply(block)
+        return child(create(tagName, builder.opts, builder.children))
     }
 
     operator fun String.unaryPlus() {

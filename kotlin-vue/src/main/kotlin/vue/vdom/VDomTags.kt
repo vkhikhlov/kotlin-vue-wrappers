@@ -6,13 +6,6 @@ import kotlinx.html.*
 import kotlinx.html.attributes.enumEncode
 import vue.VBuilder
 
-@Suppress("Unused")
-fun Template.root(classes: String? = null, init: RootNode<DIV>.() -> Unit = {}): RootNode<DIV> {
-    rootNode = RootNode(createElement, { DIV(attributesMapOf("class", classes), it) })
-    rootNode.init()
-    return rootNode
-}
-
 inline fun <T : Tag> VBuilder.initTag(block: VDOMBuilder<T>.() -> Unit = {}, noinline factory: (TagConsumer<Unit>) -> T) =
         child(VDOMBuilder(createElement, factory).apply(block).build())
 
