@@ -17,12 +17,8 @@ object WelcomeOptions : VueOptions<VData, WelcomeProps, VRefs, VComputed, Welcom
         }
     }
 
-    override fun Template.render() {
-        root {
-            keep = false
-            h1 { +"Hello ${props.name}!" }
-        }
-    }
+    override fun VBuilder.render() = h1 { +"Hello ${props.name}!" }
 }
 
-fun VBuilder.welcome(props: WelcomeProps.() -> Unit = { name = "kotlin-vue" }) = child(WelcomeOptions, props)
+fun VBuilder.welcome(block: VBuilder.() -> Unit = { v.props = jsObject<WelcomeProps> { name = "kotlin-vue" } }) =
+        child(WelcomeOptions, block)

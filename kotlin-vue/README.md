@@ -18,7 +18,7 @@ maven {
 Add dependency:
 
 ```groovy
-compile "com.github.vkhikhlov:kotlin-vue:0.0.3"
+compile "com.github.vkhikhlov:kotlin-vue:0.0.6"
 ```
 
 ### Create Vue component
@@ -26,7 +26,7 @@ compile "com.github.vkhikhlov:kotlin-vue:0.0.3"
 In most cases Vue recommends using templates to build your HTML. But also Vue has render functions, 
 a closer-to-the-compiler alternative to templates.
 
-Let's give an examples. Suppose we have next Vue component located in Hello.vue file:
+Let's give examples. Suppose we have next Vue component located in Hello.vue file:
 
 ```vue
 <template>
@@ -159,16 +159,13 @@ object WelcomeOptions : VueOptions<VData, WelcomeProps, VRefs, VComputed, Welcom
             name = jsObject { }
         }
     }
-    override fun Template.render() {
-        root {
-            keep = false
-            h1 { +"Hello ${props.name}!" }
-        }
-    }
+    
+    override fun VBuilder.render() = h1 { +"Hello ${props.name}!" }
 }
 
 
-fun VBuilder.welcome(props: WelcomeProps.() -> Unit = { name = "kotlin-vue" }) = child(WelcomeOptions, props)
+fun VBuilder.welcome(block: VBuilder.() -> Unit = { v.props = jsObject<WelcomeProps> { name = "kotlin-vue" } }) = 
+    child(WelcomeOptions, block)
 ```
 
 VBuilder lets you construct your component's template using type-safe builders, similarly to JSX.
@@ -177,17 +174,12 @@ And here's how we can use this component in another component:
 
 ```kotlin
 import vue.*
-import vue.vdom.*
 import welcome.*
 
 interface AppComponent : VueComponent<VData, VProps, VRefs>
 
 object AppOptions : VueOptions<VData, VProps, VRefs, VComputed, AppComponent>(AppComponent::class) {
-    override fun Template.render() {
-        root {
-            welcome()
-        }
-    }
+    override fun VBuilder.render() = welcome()
 }
 ```
 
@@ -195,3 +187,5 @@ Although templates are enough convenient, they are don't allow you to use full p
 language. JSX may be a good alternative, but Kotlin with his type-safe builders, static type checking, modern language 
 constructions may significantly facilitate development of complex ui systems. In addition, may be you don't know, but 
 [Vue's templates actually are compiled into render functions](https://vuejs.org/v2/guide/render-function.html#Template-Compilation).
+
+The example given above can be found in the [examples section](examples).
