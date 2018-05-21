@@ -144,7 +144,7 @@ abstract class VueOptions<
     private val __props = jsObject<P> { }
 
     @JsName("render")
-    val render = { h: CreateElement -> VBuilder(h).apply { render() }.children.firstOrNull() }
+    val render = { h: CreateElement -> VBuilder(h).render() }
 
     @JsName("router")
     var router: Router? = undefined
@@ -165,7 +165,7 @@ abstract class VueOptions<
         __props.apply(block)
     }
 
-    abstract fun VBuilder.render()
+    abstract fun VBuilder.render(): Any //TODO: change to VNode
     inline operator fun <reified T> (() -> T).unaryPlus() = unsafeCast<T>()
     private fun <T> requireIsMounted(value: T): T {
         require(that.isMounted)
