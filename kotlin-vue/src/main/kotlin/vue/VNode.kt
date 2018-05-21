@@ -17,6 +17,7 @@ external interface VNodeData {
     var nativeOn: JsonOf<(Event) -> Unit>
     var ref: String?
     var key: String?
+    var slot: String?
 }
 
 data class VNodeOptions<T : VProps>(
@@ -27,7 +28,8 @@ data class VNodeOptions<T : VProps>(
         var props: T? = undefined,
         var style: CSSStyleDeclaration? = undefined,
         var ref: String? = undefined,
-        var key: String? = undefined
+        var key: String? = undefined,
+        var slot: String? = undefined
 )
 
 interface IVElementDataBuilder<out T : VProps> {
@@ -57,6 +59,7 @@ interface IVElementDataBuilder<out T : VProps> {
     val attrs: MutableMap<String, String?>
     var ref: String?
     var key: String?
+    var slot: String?
 }
 
 class VElementDataBuilder<T : VProps>(opts: VNodeOptions<T>) : IVElementDataBuilder<T> {
@@ -118,5 +121,11 @@ class VElementDataBuilder<T : VProps>(opts: VNodeOptions<T>) : IVElementDataBuil
         get() = options.ref
         set(value) {
             options.ref = value
+        }
+
+    override var slot: String?
+        get() = options.slot
+        set(value) {
+            options.slot = value
         }
 }

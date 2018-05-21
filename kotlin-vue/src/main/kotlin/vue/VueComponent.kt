@@ -1,8 +1,12 @@
 package vue
 
+import kotlinx.html.Tag
 import org.w3c.dom.HTMLElement
+import vue.ext.JsonOf
+import vue.ext.get
 import vue.ext.jsObject
 import vue.router.Router
+import vue.vdom.VDOMBuilder
 import kotlin.reflect.KClass
 
 external interface VData
@@ -31,6 +35,9 @@ external interface VueComponent<out D : VData, out P : VProps, out R : VRefs> {
 
     @JsName("\$router")
     val router: Router
+
+    @JsName("\$slots")
+    val slots: JsonOf<Array<VNode>?>
 
     @JsName("_isMounted")
     val isMounted: Boolean
@@ -163,6 +170,10 @@ abstract class VueOptions<
 
     fun props(block: P.() -> Unit = { }) {
         __props.apply(block)
+    }
+
+    fun VDOMBuilder<Tag>.slot(name: String = "default") {
+        children.addAll(that.slots[name] ?: throw Error("Slot '$name' wasn't found!"))
     }
 
     abstract fun VBuilder.render(): Any //TODO: change to VNode

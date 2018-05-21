@@ -1,5 +1,6 @@
 package vue
 
+import kotlinx.html.Tag
 import vue.ext.*
 
 @DslMarker
@@ -27,6 +28,7 @@ open class VBuilder(val createElement: CreateElement) {
             props = opts.props
             ref = opts.ref
             key = opts.key
+            slot = opts.slot
         }
         return createElement(type, data, children?.toTypedArray())
     }
@@ -50,6 +52,13 @@ open class VBuilder(val createElement: CreateElement) {
         val builder = VBuilder(createElement).apply(block)
         return child(create(tagName, builder.opts, builder.children))
     }
+
+    @Suppress("Unused")
+    inline fun <reified T : Tag> slot(name: String = "default", crossinline block: VBuilder.() -> Unit) =
+            child(T::class.simpleName!!) {
+                v.slot = name
+                block()
+            }
 
     operator fun String.unaryPlus() {
         children.add(this)

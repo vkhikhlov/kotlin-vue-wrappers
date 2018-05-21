@@ -1,6 +1,7 @@
 package vue
 
 import org.w3c.dom.HTMLElement
+import vue.ext.JsonOf
 import vue.router.Router
 
 @Suppress("Unused")
@@ -16,6 +17,7 @@ open external class Vue<
     override val data: D
     override val refs: R
     override val router: Router
+    override val slots: JsonOf<Array<VNode>?>
     override val isMounted: Boolean
     override val parent: VueComponent<*, *, *>
     override val children: Array<VueComponent<*, *, *>>
