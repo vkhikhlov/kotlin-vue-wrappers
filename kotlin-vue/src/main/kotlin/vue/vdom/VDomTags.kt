@@ -7,7 +7,7 @@ import kotlinx.html.attributes.enumEncode
 import vue.VBuilder
 
 inline fun <T : Tag> VBuilder.initTag(block: VDOMBuilder<T>.() -> Unit = {}, noinline factory: (TagConsumer<Unit>) -> T) =
-        child(VDOMBuilder(createElement, factory).apply(block).build())
+        child(VDOMBuilder(createElement, slots, factory).apply(block).build())
 
 inline fun VBuilder.a(href: String? = null, target: String? = null, classes: String? = null, block: VDOMBuilder<A>.() -> Unit = {}) = initTag(block) { A(attributesMapOf("href", href, "target", target, "class", classes), it) }
 

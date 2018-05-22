@@ -7,11 +7,11 @@ import vue.router.Router
 @Suppress("Unused")
 @JsModule("vue")
 open external class Vue<
-        D : VData,
-        P : VProps,
-        R : VRefs,
-        C : VComputed,
-        VC: VueComponent<D, P, R>
+        out D : VData,
+        out P : VProps,
+        out R : VRefs,
+        out C : VComputed,
+        out VC: VueComponent<D, P, R>
         >(options: VueOptions<D, P, R, C, VC> = definedExternally) : VueComponent<D, P, R> {
     override val props: P
     override val data: D

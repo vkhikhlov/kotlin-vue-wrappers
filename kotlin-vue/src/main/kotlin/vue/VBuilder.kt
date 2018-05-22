@@ -7,10 +7,10 @@ import vue.ext.*
 annotation class VueDsl
 
 @VueDsl
-open class VBuilder(val createElement: CreateElement) {
+open class VBuilder(val createElement: CreateElement, val slots: JsonOf<Array<VNode>?>) {
     val children = mutableListOf<Any>()
 
-    fun <T : VProps> create(type: Any, opts: VNodeOptions<T>, children: List<Any>?): Any {
+    fun <P : VProps> create(type: Any, opts: VNodeOptions<P>, children: List<Any>?): VNode {
         fun <T> initJsonOf(map: Map<String, T?>): JsonOf<T> {
             val result = jsObject<JsonOf<T>> { }
             map.entries.forEach {
@@ -34,28 +34,28 @@ open class VBuilder(val createElement: CreateElement) {
     }
 
     protected val opts = VNodeOptions<VProps>()
-    val v = VElementDataBuilder(opts)
+    open val v: VElementDataBuilder<out VProps> = VElementDataBuilder(opts)
 
-    fun child(node: Any): Any {
+    fun child(node: VNode): VNode {
         children.add(node)
         return node
     }
 
     @Suppress("Unused")
-    fun child(options: VueOptions<*, *, *, *, *>, block: VBuilder.() -> Unit = { }): Any {
-        val builder = VBuilder(createElement).apply(block)
+    fun <P : VProps> child(options: VueOptions<*, P, *, *, *>, block: VBuilderWithProps<P>.() -> Unit = { }): VNode {
+        val builder = VBuilderWithProps<P>(createElement, slots).apply(block)
         return child(create(options, builder.opts, builder.children))
     }
 
     @Suppress("Unused")
-    fun child(tagName: String, block: VBuilder.() -> Unit = { }): Any {
-        val builder = VBuilder(createElement).apply(block)
+    fun <P : VProps> child(tagName: String, block: VBuilderWithProps<P>.() -> Unit = { }): Any {
+        val builder = VBuilderWithProps<P>(createElement, slots).apply(block)
         return child(create(tagName, builder.opts, builder.children))
     }
 
     @Suppress("Unused")
     inline fun <reified T : Tag> slot(name: String = "default", crossinline block: VBuilder.() -> Unit) =
-            child(T::class.simpleName!!) {
+            child<VProps>(T::class.simpleName!!) {
                 v.slot = name
                 block()
             }
@@ -63,4 +63,11 @@ open class VBuilder(val createElement: CreateElement) {
     operator fun String.unaryPlus() {
         children.add(this)
     }
+}
+
+@Suppress("Unused")
+open class VBuilderWithProps<P : VProps>(
+        createElement: CreateElement,
+        slots: JsonOf<Array<VNode>?>) : VBuilder(createElement, slots) {
+    override val v: VElementDataBuilder<P> = VElementDataBuilder(opts.unsafeCast<VNodeOptions<P>>())
 }

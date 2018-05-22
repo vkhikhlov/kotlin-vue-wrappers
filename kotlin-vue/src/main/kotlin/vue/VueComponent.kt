@@ -1,12 +1,9 @@
 package vue
 
-import kotlinx.html.Tag
 import org.w3c.dom.HTMLElement
 import vue.ext.JsonOf
-import vue.ext.get
 import vue.ext.jsObject
 import vue.router.Router
-import vue.vdom.VDOMBuilder
 import kotlin.reflect.KClass
 
 external interface VData
@@ -64,7 +61,7 @@ external interface VueComponent<out D : VData, out P : VProps, out R : VRefs> {
     fun off(event: String)
 }
 
-@Suppress("unused")
+@Suppress("Unused")
 abstract class VueOptions<
         out D : VData,
         out P : VProps,
@@ -97,6 +94,7 @@ abstract class VueOptions<
     val parent get() = requireIsCreated(that.parent)
     val children get() = requireIsCreated(that.children)
     val isMounted get() = that.isMounted
+    val slots get() = that.slots
     var isCreated = false
     @Suppress("MemberVisibilityCanBePrivate")
     val that
@@ -151,7 +149,7 @@ abstract class VueOptions<
     private val __props = jsObject<P> { }
 
     @JsName("render")
-    val render = { h: CreateElement -> VBuilder(h).render() }
+    val render = { h: CreateElement -> VBuilder(h, that.slots).render() }
 
     @JsName("router")
     var router: Router? = undefined
@@ -172,11 +170,7 @@ abstract class VueOptions<
         __props.apply(block)
     }
 
-    fun VDOMBuilder<Tag>.slot(name: String = "default") {
-        children.addAll(that.slots[name] ?: throw Error("Slot '$name' wasn't found!"))
-    }
-
-    abstract fun VBuilder.render(): Any //TODO: change to VNode
+    abstract fun VBuilder.render(): VNode
     inline operator fun <reified T> (() -> T).unaryPlus() = unsafeCast<T>()
     private fun <T> requireIsMounted(value: T): T {
         require(that.isMounted)

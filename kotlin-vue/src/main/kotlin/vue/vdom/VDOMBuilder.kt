@@ -4,8 +4,14 @@ import kotlinx.html.*
 import org.w3c.dom.events.Event
 import vue.CreateElement
 import vue.VBuilder
+import vue.VNode
+import vue.ext.JsonOf
+import vue.ext.get
 
-open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagConsumer<Unit>) -> T) : VBuilder(createElement) {
+open class VDOMBuilder<out T : Tag>(
+        createElement: CreateElement,
+        slots: JsonOf<Array<VNode>?>,
+        factory: (TagConsumer<Unit>) -> T) : VBuilder(createElement, slots) {
     open fun build() = create(attrs.tagName, opts, children)
 
     private val consumer = object : TagConsumer<Unit> {
@@ -25,6 +31,11 @@ open class VDOMBuilder<out T : Tag>(createElement: CreateElement, factory: (TagC
 
     @Suppress("MemberVisibilityCanBePrivate")
     val attrs: T = factory(consumer)
+
+    @Suppress("Unused")
+    fun slot(name: String = "default") {
+        children.addAll(slots[name] ?: throw Error("Slot '$name' wasn't found!"))
+    }
 
     init {
         attrs.attributesEntries.forEach {
